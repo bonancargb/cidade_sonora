@@ -1,120 +1,9 @@
 const mapContent = document.querySelector('.map-content');
-let scale = 1;
-let translateX = 0;
-let translateY = 0;
-
-function applyTransform() {
-  mapContent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-  updateMarkers();
-}
-
-function updateMarkers() {
-  document.querySelectorAll('.marker').forEach(marker => {
-    const x = parseFloat(marker.dataset.x);
-    const y = parseFloat(marker.dataset.y);
-
-    // Apply map transformations to marker position
-    const screenX = x * scale + translateX;
-    const screenY = y * scale + translateY;
-
-    // Combine translation and counter-scale in a single transform
-    marker.style.transform = `
-      translate(${screenX}px, ${screenY}px)
-      scale(${1 / scale})
-      translate(-50%, -50%) /* optional, if you want marker centered */
-    `;
-  });
-}
-
-// Zoom buttons
-document.querySelectorAll('[data-zoom]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const action = btn.dataset.zoom;
-    if (action === 'in') scale *= 1.2;
-    if (action === 'out') scale /= 1.2;
-    if (action === 'reset') { scale = 1; translateX = 0; translateY = 0; }
-    applyTransform();
-  });
+$(document).ready(function() {
+  $('.fade-in').addClass('visible');
 });
 
-// Drag to pan
-let isDragging = false, startX, startY;
-mapContent.addEventListener('mousedown', e => {
-  isDragging = true;
-  startX = e.clientX - translateX;
-  startY = e.clientY - translateY;
-});
-window.addEventListener('mousemove', e => {
-  if (!isDragging) return;
-  translateX = e.clientX - startX;
-  translateY = e.clientY - startY;
-  applyTransform();
-});
-window.addEventListener('mouseup', () => isDragging = false);
-
-// Center on load (no Panzoom, just initial translate)
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.querySelector('.map'); // viewport for the SVG
-  const content = document.querySelector('.map-content'); // SVG wrapper
-  if (!container || !content) return;
-
-  // Ensure layout is ready, then compute center
-  requestAnimationFrame(() => {
-    const vw = container.clientWidth;
-    const vh = container.clientHeight;
-    const cw = content.scrollWidth;  // intrinsic width (1672px)
-    const ch = content.scrollHeight; // intrinsic height (1180px)
-
-    // center offsets for current scale (scale defaults to 1)
-    const viewW = cw * scale;
-    const viewH = ch * scale;
-    translateX = (vw - viewW) / 2;
-    translateY = (vh - viewH) / 2;
-
-    applyTransform();
-  });
-});
-
-// Initial placement (kept for safety; will be overridden by DOMContentLoaded centering)
-applyTransform();
-
-// Center the SVG map within its container on initial load
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.querySelector('.map');         // visible viewport
-  const content = document.querySelector('.map-content');   // large SVG wrapper
-  if (!container || !content || !window.Panzoom) return;
-
-  // Initialize Panzoom on the content
-  const panzoom = Panzoom(content, {
-    contain: 'outside',
-    animate: true
-    // ...existing options if you have them...
-  });
-
-  // Compute initial pan to center the content within the container
-  const centerMap = () => {
-    const parentRect = container.getBoundingClientRect();
-    const contentRect = content.getBoundingClientRect();
-
-    // Current transform values from Panzoom
-    const { x, y, scale } = panzoom.getTransform();
-
-    // The contentRect reflects current transform; to center, offset by remaining space
-    const offsetX = (parentRect.width - contentRect.width) / 2;
-    const offsetY = (parentRect.height - contentRect.height) / 2;
-
-    // Apply pan relative to current transform
-    panzoom.pan(x + offsetX, y + offsetY);
-  };
-
-  // Wait a tick to ensure layout is complete, then center
-  requestAnimationFrame(() => {
-    centerMap();
-  });
-
-  // Optional: keep any existing controls
-  // ...existing code...
-});
+// Removed pan/zoom logic for .object-container and .map-content
 
 $('.header-btn-1').click(function() {
   $('.tab-1').toggleClass('expanded-1');
@@ -128,16 +17,13 @@ $('.header-btn-2').click(function() {
 })
 
 document.addEventListener('DOMContentLoaded', () => {
-
   const exitBtn = document.querySelector('.exit-btn button');
-
   exitBtn.addEventListener('click', () => {
     document.querySelector('.tab-1').classList.remove('expanded-1', 'shrinked-1');
     document.querySelector('.tab-2').classList.remove('expanded-2');
     document.querySelector('.info-1').classList.remove('visible');
     document.querySelector('.info-2').classList.remove('visible');
   });
-
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -234,10 +120,6 @@ function initAudioCards(scope) {
     };
   });
 }
-
-$(document).ready(function() {
-  $('.fade-in').addClass('visible');
-});
 
 document.addEventListener('DOMContentLoaded', function() {
   const tab3Toggle = document.getElementById('tab-toggle');

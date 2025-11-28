@@ -13,6 +13,10 @@
 }
 
 /* Base styles */
+html, body {
+    overscroll-behavior: none;
+}
+
 body {
     position: relative;
     background-color: #eafcf7;
@@ -366,11 +370,14 @@ p {
     height: inherit;
 }
 .object-container {
-    width: 85vw;
-    height: 85vh;
-    overflow: scroll;
+    width: min(85vw, 1672px);
+    height: min(85vh, 1180px);
+    overflow: auto;
     border: solid #015132 2px;
     border-radius: 3rem;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+    touch-action: pan-x pan-y; /* allow touch scrolling */
 }
 
 /* Map styles */
@@ -378,17 +385,16 @@ p {
     position: relative;
     width: 1672px;
     height: 1180px;
-    overflow: visible !important;
+    overflow: hidden;
 }
 .map-content {
     width: 100%;
     height: 100%;
-    transform-origin: 0 0; /* added to align Panzoom centering */
-}
-.map-content svg {
-    width: 100%;
-    height: 100%;
-    display: block;
+    transform: none !important;
+    touch-action: pan-x pan-y;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Marker styles */
@@ -465,21 +471,7 @@ button.marker:hover svg path {
 
 /* Zoom controls */
 .zoom-controls {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 100;
-    display: flex;
-    gap: 0.5rem;
-}
-.zoom-controls button {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    cursor: pointer;
+    display: none !important;
 }
 
 /* Footer styles */
